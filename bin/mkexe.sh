@@ -13,7 +13,7 @@ compile()
             #improtant to use -Wl,--no-as-needed !!
     cmd="g++ $ii  \
         -g -O3 -Wall -Werror \
-        $(root-config --auxcflags | tr -s ' ' '\n' | grep c++17)  -I$(root-config --incdir)  \
+        $(root-config --auxcflags | tr -s ' ' '\n' | grep c++1)  -I$(root-config --incdir)  \
         -Wl,--no-as-needed -L./ $(root-config --libs) \
         -lTree  -lMinuit -lASImage $lib \
         -o $allinput"

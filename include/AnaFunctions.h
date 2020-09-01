@@ -373,7 +373,7 @@ double GetThetaRef(const TVector3 &vold, const TVector3 &vreftmp)
   return theta;
 }
 
- void getCommonTKI(const int targetA, const int targetZ, const TLorentzVector *neutrinofullp, const TLorentzVector *muonfullp, const TLorentzVector *baryonfullp, double & dalphat, double & dphit, double & dpt, double & neutronmomentum, double & muontheta, double & baryontheta)
+void getCommonTKI(const int targetA, const int targetZ, const TLorentzVector *neutrinofullp, const TLorentzVector *muonfullp, const TLorentzVector *baryonfullp, double & dalphat, double & dphit, double & dpt, double & neutronmomentum, double & dpTT, double & muontheta, double & baryontheta)
 {
   //
   //note that this is for general calculation, all particle energy is sqrt(p^2+m^2)!
@@ -404,6 +404,13 @@ double GetThetaRef(const TVector3 &vold, const TVector3 &vreftmp)
   }
   else{//hydrogen
     dalphat=-999;
+  }
+
+  //if dpt<1E-5, then dpTT is independent of dalphat anyway
+  dpTT = dpt * sin(dalphat*TMath::DegToRad());
+  const Double_t dotcross = baryonfullp->Vect().Dot( (neutrinofullp->Vect()).Cross( muonfullp->Vect() ));
+  if(dotcross<0){
+    dpTT *= -1;
   }
 
   muontheta = TMath::ATan(pTmuon.Mag()/plmuon.Mag())*TMath::RadToDeg();
@@ -439,6 +446,13 @@ double GetThetaRef(const TVector3 &vold, const TVector3 &vreftmp)
   neutronmomentum = sqrt(pL*pL + pT*pT);
 }
 
+void getCommonTKI(const int targetA, const int targetZ, const TLorentzVector *neutrinofullp, const TLorentzVector *muonfullp, const TLorentzVector *baryonfullp, double & dalphat, double & dphit, double & dpt, double & neutronmomentum, double & muontheta, double & baryontheta)
+{
+  double dummydptt;
+  getCommonTKI(targetA, targetZ, neutrinofullp, muonfullp, baryonfullp, dalphat, dphit, dpt, neutronmomentum, dummydptt, muontheta, baryontheta);
+}
+
+//end of namespace
 }
 
 #endif

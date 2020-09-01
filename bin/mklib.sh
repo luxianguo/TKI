@@ -2,7 +2,7 @@ code=$1
 
 rm -f lib${code}.so  *.o *Dict.* 
 
-cflag="$(root-config --auxcflags | tr -s ' ' '\n' | grep c++17)  -I$(root-config --incdir) -I$(pwd)"
+cflag="$(root-config --auxcflags | tr -s ' ' '\n' | grep c++1)  -I$(root-config --incdir) -I$(pwd)"
 
 echo $cflag
 
