@@ -1,8 +1,8 @@
 echo
 echo
 echo "              Remember pull first!!!"
-echo "              Remember to merge xlu <-> master"
-echo "              Remember to push origin master"
+echo "              Remember to merge dev <-> master"
+echo "              Remember to push origin dev and master"
 echo
 
 echo "===================================== " Branch...
