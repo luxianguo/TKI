@@ -671,6 +671,7 @@ void style::DrawHist(TList *lout, const double plotscale, TList * overlayList, c
     if(!kfast){
       c1->Print(outdir+"/"+tag+".pdf");
       c1->Print(outdir+"/"+tag+".eps");
+      c1->Print(outdir+"/"+tag+".C");
     }
   }
 
