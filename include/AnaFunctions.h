@@ -395,7 +395,47 @@ double GetThetaRef(const TVector3 &vold, const TVector3 &vreftmp)
   return theta;
 }
 
- void getCommonTKI(const int targetA, const int targetZ, const TLorentzVector *neutrinofullp, const TLorentzVector *muonfullp, const TLorentzVector *baryonfullp, double & dalphat, double & dphit, double & dpt, double & neutronmomentum, double & dpTT, double & muontheta, double & baryontheta, double & beamEnergy)
+double getdPL(const double beamMass, const double dPT, const double pLl, const double pLn, const double el, const double en, const double m1, const double m2)
+ {
+   const double AA = pLl + pLn;
+   const double BB = el + en - m1;
+   const double CC = m2*m2 + dPT*dPT;
+
+   const double aa = -AA/BB;
+   const double bb = ( AA*AA - BB*BB - CC + beamMass*beamMass )/2/BB;
+
+   const double delta = 4*aa*aa*bb*bb-4*(aa*aa-1)*(bb*bb-CC);
+
+   const double sol1 = (-2*aa*bb+sqrt(delta))/2/(aa*aa-1);
+   const double sol2 = (-2*aa*bb-sqrt(delta))/2/(aa*aa-1);
+
+   const double lhs1 = aa*sol1 + bb;
+   const double lhs2 = aa*sol2 + bb;
+
+   const double beamP1 = AA - sol1;
+   const double beamP2 = AA - sol2;
+
+   double dpL = -999;
+   int kpass = 0;
+   if(lhs1>0 && beamP1>0){
+     kpass++;
+     dpL = sol1;
+   }
+   if(lhs2>0 && beamP2>0){
+     kpass++;
+     dpL = sol2;
+   }
+
+   if(kpass==1){
+     return dpL;
+   }
+   else{
+     printf("AnaFunctions::getdPL bad solution AA %f sol1 %f sol2 %f lhs1 %f lhs2 %f\n", AA, sol1, sol2, lhs1, lhs2);
+     exit(1);
+   }
+ }
+
+ void getCommonTKI(const int targetA, const int targetZ, const TLorentzVector *neutrinofullp, const TLorentzVector *muonfullp, const TLorentzVector *baryonfullp, double & dalphat, double & dphit, double & dpt, double & neutronmomentum, double & dpTT, double & muontheta, double & baryontheta, const double beamMass, double & beamMomentum)
 {
   //
   //note that this is for general calculation, all particle energy is sqrt(p^2+m^2)!
@@ -460,21 +500,33 @@ double GetThetaRef(const TVector3 &vold, const TVector3 &vreftmp)
   const double Epprim = baryonfullp->E();//already experimental momentum
   const double pprimL = plbaryon.Mag();
 
-  const double factor = ma - Eprim - Epprim + kprimL + pprimL;
   const double pT = vdPt.Mag();
 
+  //void getdPL(const double beamMass, const double dPT, const double pLl, const double pLn, const double el, const double en, const double m1, const double m2)
+  const double pL = getdPL(beamMass, pT, kprimL, pprimL, Eprim, Epprim, ma, mastar);
+
+  /*
+  const double factor = ma - Eprim - Epprim + kprimL + pprimL;
   const double pL = -(mastar*mastar + pT*pT-factor*factor)/2.0/factor;
+  if(fabs(calcdPL-pL)>1e-6){
+    printf("AnaFunction::getCommonTKI wrong calcdPL and pL pL %f calcdPL %f\n", pL, calcdPL); 
+    exit(1);
+  }
+  */
 
   neutronmomentum = sqrt(pL*pL + pT*pT);
 
-  beamEnergy = kprimL+pprimL - pL; 
+  beamMomentum = kprimL+pprimL - pL; 
+
 }
 
+ /*
 void getCommonTKI(const int targetA, const int targetZ, const TLorentzVector *neutrinofullp, const TLorentzVector *muonfullp, const TLorentzVector *baryonfullp, double & dalphat, double & dphit, double & dpt, double & neutronmomentum, double & muontheta, double & baryontheta)
 {
   double dummydptt, dummybeamenergy;
   getCommonTKI(targetA, targetZ, neutrinofullp, muonfullp, baryonfullp, dalphat, dphit, dpt, neutronmomentum, dummydptt, muontheta, baryontheta, dummybeamenergy);
 }
+ */
 
 //end of namespace
 }
