@@ -22,6 +22,28 @@ double MA()
   return MA;
 }
 
+int getTargetA(const int targetZ)
+{
+  if(targetZ == 1){
+    return 1;
+  }
+  else if(targetZ == 6){
+    return 12;
+  }
+  else if(targetZ == 8){
+    return 16;
+  }
+  else if(targetZ == 26){
+    return 56;
+  }
+  else if(targetZ == 82){
+    return 207;
+  }
+  else{
+    printf("\nNuGenTKI/include/AnaFunctions.h Unknown targetZ %d\n\n", targetZ); exit(1);
+  }
+}
+
 double nuclearMass(const int targetA, const int targetZ)
 {
   const double eb = 92.162;//eb in MeV, use C12 binding energy for the time being
