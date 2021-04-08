@@ -395,7 +395,7 @@ double GetThetaRef(const TVector3 &vold, const TVector3 &vreftmp)
   return theta;
 }
 
-void getCommonTKI(const int targetA, const int targetZ, const TLorentzVector *neutrinofullp, const TLorentzVector *muonfullp, const TLorentzVector *baryonfullp, double & dalphat, double & dphit, double & dpt, double & neutronmomentum, double & dpTT, double & muontheta, double & baryontheta)
+ void getCommonTKI(const int targetA, const int targetZ, const TLorentzVector *neutrinofullp, const TLorentzVector *muonfullp, const TLorentzVector *baryonfullp, double & dalphat, double & dphit, double & dpt, double & neutronmomentum, double & dpTT, double & muontheta, double & baryontheta, double & beamEnergy)
 {
   //
   //note that this is for general calculation, all particle energy is sqrt(p^2+m^2)!
@@ -466,12 +466,14 @@ void getCommonTKI(const int targetA, const int targetZ, const TLorentzVector *ne
   const double pL = -(mastar*mastar + pT*pT-factor*factor)/2.0/factor;
 
   neutronmomentum = sqrt(pL*pL + pT*pT);
+
+  beamEnergy = kprimL+pprimL - pL; 
 }
 
 void getCommonTKI(const int targetA, const int targetZ, const TLorentzVector *neutrinofullp, const TLorentzVector *muonfullp, const TLorentzVector *baryonfullp, double & dalphat, double & dphit, double & dpt, double & neutronmomentum, double & muontheta, double & baryontheta)
 {
-  double dummydptt;
-  getCommonTKI(targetA, targetZ, neutrinofullp, muonfullp, baryonfullp, dalphat, dphit, dpt, neutronmomentum, dummydptt, muontheta, baryontheta);
+  double dummydptt, dummybeamenergy;
+  getCommonTKI(targetA, targetZ, neutrinofullp, muonfullp, baryonfullp, dalphat, dphit, dpt, neutronmomentum, dummydptt, muontheta, baryontheta, dummybeamenergy);
 }
 
 //end of namespace
