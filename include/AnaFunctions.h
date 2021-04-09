@@ -46,9 +46,16 @@ int getTargetA(const int targetZ)
 
 double nuclearMass(const int targetA, const int targetZ)
 {
-  const double eb = 92.162;//eb in MeV, use C12 binding energy for the time being
-  const double MA = (targetA-targetZ)*NeutronMass() + targetZ*ProtonMass() - eb/1E3;//GeV
-  return MA;
+  if(targetZ==18 && targetA==40){
+    //eb = 343.8;// MeV, binding energy for Ar-40 https://www.wolframalpha.com/input/?i=Argon-40+binding+energy+*+40
+    return 37.2247242;//GeV directly return mass https://www.wolframalpha.com/input/?i=Argon-40+mass+in+gev 
+  }
+  else{
+    const double eb = 92.162;//eb in MeV, use C12 binding energy for the time being https://www.wolframalpha.com/input/?i=carbon-12+binding+energy+*12
+
+    const double MA = (targetA-targetZ)*NeutronMass() + targetZ*ProtonMass() - eb/1E3;//GeV
+    return MA;
+  }
 }
 
 double nuclearMassStar(const int targetA, const int targetZ)
