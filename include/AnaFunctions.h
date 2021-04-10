@@ -402,7 +402,7 @@ double GetThetaRef(const TVector3 &vold, const TVector3 &vreftmp)
   return theta;
 }
 
-double getMx2(const double beamMass, const double beamMomentum, const double dPT, const double pLl, const double pLn, const double el, const double en, const double m1)
+double getMx(const double beamMass, const double beamMomentum, const double dPT, const double pLl, const double pLn, const double el, const double en, const double m1)
 {
   const double AA = pLl + pLn;
   const double BB = el + en - m1;
@@ -412,7 +412,12 @@ double getMx2(const double beamMass, const double beamMomentum, const double dPT
 
   const double mxSq = TMath::Power(beamEnergy - BB, 2) - dPT*dPT - dpl*dpl;
 
-  return mxSq; 
+  if(mxSq<0){
+    return -999;
+  }
+  else{
+    return TMath::Sqrt(mxSq); 
+  }
 }
 
 double getdPL(const double beamMass, const double dPT, const double pLl, const double pLn, const double el, const double en, const double m1, const double m2)
@@ -455,7 +460,7 @@ double getdPL(const double beamMass, const double dPT, const double pLl, const d
    }
  }
 
-void getCommonTKI(const int targetA, const int targetZ, const TLorentzVector *neutrinofullp, const TLorentzVector *muonfullp, const TLorentzVector *baryonfullp, double & dalphat, double & dphit, double & dpt, double & neutronmomentum, double & dpTT, double & muontheta, double & baryontheta, const double beamMass, double & pBeam, double & Mx2)
+void getCommonTKI(const int targetA, const int targetZ, const TLorentzVector *neutrinofullp, const TLorentzVector *muonfullp, const TLorentzVector *baryonfullp, double & dalphat, double & dphit, double & dpt, double & neutronmomentum, double & dpTT, double & muontheta, double & baryontheta, const double beamMass, double & pBeam, double & Mx)
 {
   //
   //note that this is for general calculation, all particle energy is sqrt(p^2+m^2)!
@@ -538,9 +543,8 @@ void getCommonTKI(const int targetA, const int targetZ, const TLorentzVector *ne
 
   pBeam = kprimL+pprimL - pL; 
 
-  //double getMx2(const double beamMass, const double beamMomentum, const double dPT, const double pLl, const double pLn, const double el, const double en, const double m1)
   const double tmpenu = neutrinofullp->E();
-  Mx2 = getMx2(beamMass, tmpenu, pT, kprimL, pprimL, Eprim, Epprim, ma);
+  Mx = getMx(beamMass, tmpenu, pT, kprimL, pprimL, Eprim, Epprim, ma);
 
 }
 
