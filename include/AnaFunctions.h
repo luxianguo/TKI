@@ -460,14 +460,14 @@ double getdPL(const double beamMass, const double dPT, const double pLl, const d
    }
  }
 
-void getCommonTKI(const int targetA, const int targetZ, const TLorentzVector *neutrinofullp, const TLorentzVector *muonfullp, const TLorentzVector *baryonfullp, double & dalphat, double & dphit, double & dpt, double & neutronmomentum, double & dpTT, double & muontheta, double & baryontheta, const double beamMass, double & pBeam, double & Mx)
+void getCommonTKI(const int targetA, const int targetZ, const TLorentzVector *beamfullp, const TLorentzVector *muonfullp, const TLorentzVector *baryonfullp, double & dalphat, double & dphit, double & dpt, double & neutronmomentum, double & dpTT, double & muontheta, double & baryontheta, const double beamMass, double & pBeam, double & Mx)
 {
   //
   //note that this is for general calculation, all particle energy is sqrt(p^2+m^2)!
   //to-do: currently still using massless beam! Need to fix.
   //
 
-  const TVector3 unitneutrino= neutrinofullp->Vect().Unit();
+  const TVector3 unitneutrino= beamfullp->Vect().Unit();
 
   //from 
   //http://cdcvs0.fnal.gov/cgi-bin/public-cvs/cvsweb-public.cgi/AnalysisFramework/External/GENIEXSecExtract/src/XSec.cxx?annotate=1.20;cvsroot=mnvsoft;sortby=date
@@ -495,7 +495,7 @@ void getCommonTKI(const int targetA, const int targetZ, const TLorentzVector *ne
 
   //if dpt<1E-5, then dpTT is independent of dalphat anyway
   dpTT = dpt * sin(dalphat*TMath::DegToRad());
-  const Double_t dotcross = baryonfullp->Vect().Dot( (neutrinofullp->Vect()).Cross( muonfullp->Vect() ));
+  const Double_t dotcross = baryonfullp->Vect().Dot( (beamfullp->Vect()).Cross( muonfullp->Vect() ));
   if(dotcross<0){
     dpTT *= -1;
   }
@@ -543,16 +543,18 @@ void getCommonTKI(const int targetA, const int targetZ, const TLorentzVector *ne
 
   pBeam = kprimL+pprimL - pL; 
 
-  const double tmpenu = neutrinofullp->E();
-  Mx = getMx(beamMass, tmpenu, pT, kprimL, pprimL, Eprim, Epprim, ma);
+  printf("testbug  P %f E %f M %f\n", beamfullp->P(), beamfullp->E(), beamfullp->M());
+  const double tmpBeamP = beamfullp->P();
+  //double getMx(const double beamMass, const double beamMomentum, const double dPT, const double pLl, const double pLn, const double el, const double en, const double m1)
+  Mx = getMx(beamMass, tmpBeamP, pT, kprimL, pprimL, Eprim, Epprim, ma);
 
 }
 
  /*
-void getCommonTKI(const int targetA, const int targetZ, const TLorentzVector *neutrinofullp, const TLorentzVector *muonfullp, const TLorentzVector *baryonfullp, double & dalphat, double & dphit, double & dpt, double & neutronmomentum, double & muontheta, double & baryontheta)
+void getCommonTKI(const int targetA, const int targetZ, const TLorentzVector *beamfullp, const TLorentzVector *muonfullp, const TLorentzVector *baryonfullp, double & dalphat, double & dphit, double & dpt, double & neutronmomentum, double & muontheta, double & baryontheta)
 {
   double dummydptt, dummybeamenergy;
-  getCommonTKI(targetA, targetZ, neutrinofullp, muonfullp, baryonfullp, dalphat, dphit, dpt, neutronmomentum, dummydptt, muontheta, baryontheta, dummybeamenergy);
+  getCommonTKI(targetA, targetZ, beamfullp, muonfullp, baryonfullp, dalphat, dphit, dpt, neutronmomentum, dummydptt, muontheta, baryontheta, dummybeamenergy);
 }
  */
 
