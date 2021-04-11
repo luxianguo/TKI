@@ -74,6 +74,10 @@ double nuclearMassStar(const int targetA, const int targetZ)
     const double Bin=27.13/1E3;//GeV, use C11 excitation energy for the time being
     const double MAstar = nuclearMass(targetA, targetZ) - NeutronMass() + Bin; //GeV
 
+    //printf("testpneb10down bin %f ", Bin);
+    //tested by varing Bin 10% up and down, the pn in 0pi and piZERO has (10up-10down)/default varing less than 1%, see
+    //https://docs.google.com/spreadsheets/d/1EiQ-W-YeHJF4STdY_Gs_H7yEr4gCL2TgjxUjxV6eWXM/edit?usp=sharing
+
     //checked output: ma 11.174860 mastar 10.262425
     //https://www.wolframalpha.com/input/?i=carbon-11+mass+in+gev 10.2570855
     return MAstar;
