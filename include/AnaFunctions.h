@@ -543,7 +543,7 @@ void getCommonTKI(const int targetA, const int targetZ, const TLorentzVector *be
 
   pBeam = kprimL+pprimL - pL; 
 
-  printf("testbug  P %f E %f M %f\n", beamfullp->P(), beamfullp->E(), beamfullp->M());
+  //printf("testbug  P %f E %f M %f\n", beamfullp->P(), beamfullp->E(), beamfullp->M());
   const double tmpBeamP = beamfullp->P();
   //double getMx(const double beamMass, const double beamMomentum, const double dPT, const double pLl, const double pLn, const double el, const double en, const double m1)
   Mx = getMx(beamMass, tmpBeamP, pT, kprimL, pprimL, Eprim, Epprim, ma);
