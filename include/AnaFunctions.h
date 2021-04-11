@@ -54,18 +54,33 @@ double nuclearMass(const int targetA, const int targetZ)
     const double eb = 92.162;//eb in MeV, use C12 binding energy for the time being https://www.wolframalpha.com/input/?i=carbon-12+binding+energy+*12
 
     const double MA = (targetA-targetZ)*NeutronMass() + targetZ*ProtonMass() - eb/1E3;//GeV
+
+    //checked output: ma 11.174860 mastar 10.262425
+    //https://www.wolframalpha.com/input/?i=carbon-12+mass+in+gev 11.18
     return MA;
   }
 }
 
 double nuclearMassStar(const int targetA, const int targetZ)
 {
-  //see MAstar() below
-  const double Bin=27.13/1E3;//GeV, use C11 excitation energy for the time being
-  const double MAstar = nuclearMass(targetA, targetZ) - NeutronMass() + Bin; //GeV
-  return MAstar;
+  if(targetZ==18 && targetA==40){
+    //https://www.wolframalpha.com/input/?i=Argon-39+mass+in+gev                       36.295028
+    //https://www.wolframalpha.com/input/?i=chlorine-39+mass+in+gev                    36.2984698
+    //Ar-39 or Cl-39 both have mass 36.3 GeV, use mean 36.2967489
+    return 36.2967489;//GeV average of the two
+  }
+  else{  
+    //see MAstar() below
+    const double Bin=27.13/1E3;//GeV, use C11 excitation energy for the time being
+    const double MAstar = nuclearMass(targetA, targetZ) - NeutronMass() + Bin; //GeV
+
+    //checked output: ma 11.174860 mastar 10.262425
+    //https://www.wolframalpha.com/input/?i=carbon-11+mass+in+gev 10.2570855
+    return MAstar;
+  }
 }
 
+/*
 //to-do: need to distinguish nu and nubar (neutron or proton mass), also Bin !
 double MAstar()
 {
@@ -76,6 +91,7 @@ double MAstar()
   const double MAstar = MA() - NeutronMass() + Bin; //GeV
   return MAstar;
 }
+*/
 
 double Energy(const TLorentzVector * vec, const double mm)
 {
@@ -540,6 +556,8 @@ void getCommonTKI(const int targetA, const int targetZ, const TLorentzVector *be
   */
 
   neutronmomentum = TMath::Sqrt(pL*pL + pT*pT);
+
+  //printf("testpn ma %f mastar %f pL %f neutronmomentum %f\n", ma, mastar, pL, neutronmomentum);
 
   pBeam = kprimL+pprimL - pL; 
 
