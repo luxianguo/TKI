@@ -33,6 +33,9 @@ int getTargetA(const int targetZ)
   else if(targetZ == 8){
     return 16;
   }
+  else if(targetZ == 18){
+    return 40;
+  }
   else if(targetZ == 26){
     return 56;
   }
@@ -442,6 +445,8 @@ double getMx(const double beamMass, const double beamMomentum, const double dPT,
 
 double getdPL(const double beamMass, const double dPT, const double pLl, const double pLn, const double el, const double en, const double m1, const double m2)
  {
+   //printf("debug beamMass %f m1 %f m2 %f dpT %f pLl %f pLn %f el %f en %f\n", beamMass, m1, m2, dPT, pLl, pLn, el, en);
+   
    const double AA = pLl + pLn;
    const double BB = el + en - m1;
    const double CC = m2*m2 + dPT*dPT;
@@ -451,6 +456,11 @@ double getdPL(const double beamMass, const double dPT, const double pLl, const d
 
    const double delta = 4*aa*aa*bb*bb-4*(aa*aa-1)*(bb*bb-CC);
 
+   if(delta<0){
+     printf("AnaFunctions::getdPL delta < 0!! aa %f bb %f CC %f delta %f\n", aa, bb, CC, delta);
+     return -999;
+   }
+   
    const double sol1 = (-2*aa*bb+TMath::Sqrt(delta))/2/(aa*aa-1);
    const double sol2 = (-2*aa*bb-TMath::Sqrt(delta))/2/(aa*aa-1);
 
@@ -480,13 +490,16 @@ double getdPL(const double beamMass, const double dPT, const double pLl, const d
    }
  }
 
-void getCommonTKI(const int targetA, const int targetZ, const TLorentzVector *beamfullp, const TLorentzVector *muonfullp, const TLorentzVector *baryonfullp, double & dalphat, double & dphit, double & dpt, double & neutronmomentum, double & dpTT, double & muontheta, double & baryontheta, const double beamMass, double & pBeam, double & Mx)
+void getCommonTKI(const int targetA, const int targetZ, const TLorentzVector *beamfullp, const TLorentzVector *muonfullp, const TLorentzVector *baryonfullp, double & dalphat, double & dphit, double & dpt, double & neutronmomentum, double & dpTT, double & muontheta, double & baryontheta, double & pBeam, double & Mx)
 {
   //
   //note that this is for general calculation, all particle energy is sqrt(p^2+m^2)!
   //to-do: currently still using massless beam! Need to fix.
   //
 
+  //cout<<"testbeamfullp"<<endl; beamfullp->Print();
+  const double beamMass = beamfullp->M();
+  
   const TVector3 unitneutrino= beamfullp->Vect().Unit();
 
   //from 
@@ -549,7 +562,10 @@ void getCommonTKI(const int targetA, const int targetZ, const TLorentzVector *be
 
   //void getdPL(const double beamMass, const double dPT, const double pLl, const double pLn, const double el, const double en, const double m1, const double m2)
   const double pL = getdPL(beamMass, pT, kprimL, pprimL, Eprim, Epprim, ma, mastar);
-
+  neutronmomentum = -999;
+  pBeam = -999;
+  Mx = -999;
+  if(pL!=-999){
   /*
   const double factor = ma - Eprim - Epprim + kprimL + pprimL;
   const double pL = -(mastar*mastar + pT*pT-factor*factor)/2.0/factor;
@@ -569,7 +585,7 @@ void getCommonTKI(const int targetA, const int targetZ, const TLorentzVector *be
   const double tmpBeamP = beamfullp->P();
   //double getMx(const double beamMass, const double beamMomentum, const double dPT, const double pLl, const double pLn, const double el, const double en, const double m1)
   Mx = getMx(beamMass, tmpBeamP, pT, kprimL, pprimL, Eprim, Epprim, ma);
-
+  }
 }
 
  /*
