@@ -436,6 +436,7 @@ double getMx(const double beamMass, const double beamMomentum, const double dPT,
   const double mxSq = TMath::Power(beamEnergy - BB, 2) - dPT*dPT - dpl*dpl;
 
   if(mxSq<0){
+    printf("AnaFunctions::getMx mxSq<0 beamEnergy %f BB %f dPT %f dpl %f mxSq %f\n", beamEnergy, BB, dPT, dpl, mxSq);
     return -999;
   }
   else{
@@ -580,12 +581,13 @@ void getCommonTKI(const int targetA, const int targetZ, const TLorentzVector *be
   //printf("testpn ma %f mastar %f pL %f neutronmomentum %f\n", ma, mastar, pL, neutronmomentum);
 
   pBeam = kprimL+pprimL - pL; 
-
+  }
+  
   //printf("testbug  P %f E %f M %f\n", beamfullp->P(), beamfullp->E(), beamfullp->M());
   const double tmpBeamP = beamfullp->P();
   //double getMx(const double beamMass, const double beamMomentum, const double dPT, const double pLl, const double pLn, const double el, const double en, const double m1)
   Mx = getMx(beamMass, tmpBeamP, pT, kprimL, pprimL, Eprim, Epprim, ma);
-  }
+  
 }
 
  /*
