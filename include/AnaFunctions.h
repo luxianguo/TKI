@@ -459,7 +459,7 @@ double getdPL(const double beamMass, const double dPT, const double pLl, const d
 
    if(delta<0){
      printf("AnaFunctions::getdPL delta < 0!! aa %f bb %f CC %f delta %f\n", aa, bb, CC, delta);
-     return -999;
+     exit(1);
    }
    
    const double sol1 = (-2*aa*bb+TMath::Sqrt(delta))/2/(aa*aa-1);
@@ -563,10 +563,7 @@ void getCommonTKI(const int targetA, const int targetZ, const TLorentzVector *be
 
   //void getdPL(const double beamMass, const double dPT, const double pLl, const double pLn, const double el, const double en, const double m1, const double m2)
   const double pL = getdPL(beamMass, pT, kprimL, pprimL, Eprim, Epprim, ma, mastar);
-  neutronmomentum = -999;
-  pBeam = -999;
-  Mx = -999;
-  if(pL!=-999){
+
   /*
   const double factor = ma - Eprim - Epprim + kprimL + pprimL;
   const double pL = -(mastar*mastar + pT*pT-factor*factor)/2.0/factor;
@@ -581,7 +578,6 @@ void getCommonTKI(const int targetA, const int targetZ, const TLorentzVector *be
   //printf("testpn ma %f mastar %f pL %f neutronmomentum %f\n", ma, mastar, pL, neutronmomentum);
 
   pBeam = kprimL+pprimL - pL; 
-  }
   
   //printf("testbug  P %f E %f M %f\n", beamfullp->P(), beamfullp->E(), beamfullp->M());
   const double tmpBeamP = beamfullp->P();
