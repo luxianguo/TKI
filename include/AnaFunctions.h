@@ -15,13 +15,15 @@ Double_t KaonMass(){ return 493.677/1e3;}//in GeV //wiki
 Double_t ElectronMass(){ return 0.510998/1e3;}//in GeV //wiki
 Double_t PiZeroMass(){return 134.976/1e3;}//in GeV//wiki
 
+  /*
 double MA()
 {
   const double MA = 6*NeutronMass() + 6*ProtonMass() - 92.162/1E3;//GeV
 
   return MA;
 }
-
+  */
+  
 int getTargetA(const int targetZ)
 {
   if(targetZ == 1){
@@ -425,31 +427,43 @@ double GetThetaRef(const TVector3 &vold, const TVector3 &vreftmp)
   return theta;
 }
 
-double getMx(const double beamMass, const double beamMomentum, const double dPT, const double pLl, const double pLn, const double el, const double en, const double m1)
+TVector3 getPtVect(const TLorentzVector * fullp, const TLorentzVector * basevect)
 {
-  const double AA = pLl + pLn;
-  const double BB = el + en - m1;
+  const TVector3 unitvect = (basevect->Vect()).Unit();
+  
+  const TVector3 pLvect = unitvect * fullp->Vect().Dot(unitvect);
 
-  const double dpl = AA-beamMomentum;
-  const double beamEnergy = TMath::Sqrt( beamMass*beamMass + beamMomentum*beamMomentum );
+  return fullp->Vect() - pLvect;
+}
 
-  const double mxSq = TMath::Power(beamEnergy - BB, 2) - dPT*dPT - dpl*dpl;
+double getIniNtrueP(const double beamP, const double dPT, const double pLFS)
+{
+  const double dpl = pLFS - beamP;
+  return TMath::Sqrt(dpl*dpl+dPT*dPT);
+}
+
+double getMx(const double beamMass, const double beamP, const double dPT, const double pLFS, const double eFS, const double m1)
+{
+  const double beamEnergy = TMath::Sqrt( beamMass*beamMass + beamP*beamP );
+  const double iniNp = getIniNtrueP(beamP, dPT, pLFS);
+  const double BB = eFS - m1;
+  const double mxSq = TMath::Power(beamEnergy - BB, 2) - iniNp*iniNp;
 
   if(mxSq<0){
-    printf("AnaFunctions::getMx mxSq<0 beamEnergy %f BB %f dPT %f dpl %f mxSq %f\n", beamEnergy, BB, dPT, dpl, mxSq);
-    return -999;
+    printf("AnaFunctions::getMx mxSq<0 beamEnergy %f BB %f dPT %f mxSq %f\n", beamEnergy, BB, dPT, mxSq); exit(1);
+    //return -999;
   }
   else{
     return TMath::Sqrt(mxSq); 
   }
 }
 
-double getdPL(const double beamMass, const double dPT, const double pLl, const double pLn, const double el, const double en, const double m1, const double m2)
- {
+double getdPL(const double beamMass, const double dPT, const double pLFS, const double eFS, const double m1, const double m2)
+{
    //printf("debug beamMass %f m1 %f m2 %f dpT %f pLl %f pLn %f el %f en %f\n", beamMass, m1, m2, dPT, pLl, pLn, el, en);
    
-   const double AA = pLl + pLn;
-   const double BB = el + en - m1;
+   const double AA = pLFS;
+   const double BB = eFS - m1;
    const double CC = m2*m2 + dPT*dPT;
 
    const double aa = -AA/BB;
@@ -489,81 +503,49 @@ double getdPL(const double beamMass, const double dPT, const double pLl, const d
      printf("AnaFunctions::getdPL bad solution AA %f sol1 %f sol2 %f lhs1 %f lhs2 %f\n", AA, sol1, sol2, lhs1, lhs2);
      exit(1);
    }
- }
+}
 
-void getCommonTKI(const int targetA, const int targetZ, const TLorentzVector *beamfullp, const TLorentzVector *muonfullp, const TLorentzVector *baryonfullp, double & dalphat, double & dphit, double & dpt, double & neutronmomentum, double & dpTT, double & muontheta, double & baryontheta, double & pBeam, double & Mx)
+void getCommonTKI(const int targetA, const int targetZ, const TLorentzVector *beamfullp, const TLorentzVector *scatterfullp, const TLorentzVector *recoilfullp, double & dalphat, double & dphit, double & dpt, double & iniNcalcP, double & dpTT, double & scatterTheta, double & recoilTheta, double & beamcalcP, double & Mx)
 {
   //
   //note that this is for general calculation, all particle energy is sqrt(p^2+m^2)!
-  //to-do: currently still using massless beam! Need to fix.
   //
-
-  //cout<<"testbeamfullp"<<endl; beamfullp->Print();
-  const double beamMass = beamfullp->M();
-  
-  const TVector3 unitneutrino= beamfullp->Vect().Unit();
-
-  //from 
-  //http://cdcvs0.fnal.gov/cgi-bin/public-cvs/cvsweb-public.cgi/AnalysisFramework/External/GENIEXSecExtract/src/XSec.cxx?annotate=1.20;cvsroot=mnvsoft;sortby=date
-  
-  const TVector3 plmuon   = unitneutrino *   muonfullp->Vect().Dot(unitneutrino);
-  const TVector3 plbaryon = unitneutrino * baryonfullp->Vect().Dot(unitneutrino);
-  
-  const TVector3 pTmuon   = muonfullp->Vect()   - plmuon;
-  const TVector3 pTbaryon = baryonfullp->Vect() - plbaryon;
-  const TVector3 vdPt     = pTmuon + pTbaryon;
-
+  const TLorentzVector allFSfullp =  scatterfullp ? ((*recoilfullp)+(*scatterfullp)) : (*recoilfullp) ;
+  const TVector3 vdPt = getPtVect(&allFSfullp, beamfullp);
   dpt = vdPt.Mag();
+  
+  if(scatterfullp){
+    const TVector3 pTscatter = getPtVect(scatterfullp, beamfullp);
+    const TVector3 pTrecoil  = getPtVect(recoilfullp, beamfullp);
 
-  const TVector3 unitqt = -pTmuon.Unit();
+    const TVector3 unitqt = -pTscatter.Unit();
+    dphit   = TMath::ACos(pTrecoil.Dot(unitqt)/pTrecoil.Mag())*TMath::RadToDeg(); //in Deg 
 
-  dphit   = TMath::ACos(pTbaryon.Dot(unitqt)/pTbaryon.Mag())*TMath::RadToDeg(); //in Deg 
+    //dpt cutoff for hydrogen res dpt is 1E-5 
+    if(dpt>1E-5){
+      dalphat = TMath::ACos(    vdPt.Dot(unitqt)/vdPt.Mag()    )*TMath::RadToDeg(); //in Deg
+    }
+    else{//hydrogen
+      dalphat=-999;
+    }
 
-  //dpt cutoff for hydrogen res dpt is 1E-5 
-  if(dpt>1E-5){
-    dalphat = TMath::ACos(    vdPt.Dot(unitqt)/vdPt.Mag()    )*TMath::RadToDeg(); //in Deg
-  }
-  else{//hydrogen
-    dalphat=-999;
-  }
+    //if dpt<1E-5, then dpTT is independent of dalphat anyway
+    dpTT = dpt * sin(dalphat*TMath::DegToRad());
+    const Double_t dotcross = recoilfullp->Vect().Dot( (beamfullp->Vect()).Cross( scatterfullp->Vect() ));
+    if(dotcross<0){
+      dpTT *= -1;
+    }
 
-  //if dpt<1E-5, then dpTT is independent of dalphat anyway
-  dpTT = dpt * sin(dalphat*TMath::DegToRad());
-  const Double_t dotcross = baryonfullp->Vect().Dot( (beamfullp->Vect()).Cross( muonfullp->Vect() ));
-  if(dotcross<0){
-    dpTT *= -1;
-  }
-
-  muontheta = TMath::ATan(pTmuon.Mag()/plmuon.Mag())*TMath::RadToDeg();
-  if(muonfullp->Vect().Dot(unitneutrino)<0){
-    muontheta = 180-muontheta;
-  }
-
-  baryontheta = TMath::ATan(pTbaryon.Mag()/plbaryon.Mag())*TMath::RadToDeg();
-  if(baryonfullp->Vect().Dot(unitneutrino)<0){
-    baryontheta = 180-baryontheta;
+    scatterTheta = GetThetaRef(scatterfullp->Vect(), beamfullp->Vect());
+    recoilTheta  = GetThetaRef(recoilfullp->Vect(),  beamfullp->Vect());
   }
 
-  //modified from original codes by J. Sobczyk 14 Nov 2017
+  //original codes by J. Sobczyk 14 Nov 2017
   //https://journals.aps.org/prc/abstract/10.1103/PhysRevC.95.065501
   //Eq. 11
   //all in GeV
-
-  const double ma     = nuclearMass(targetA, targetZ);
-  const double mastar = nuclearMassStar(targetA, targetZ);
-
-  const double Eprim  = muonfullp->E();
-  //const double Eprim  = Energy(muonfullp, MuonMass());//use experimental momentum -> Not here
-  const double kprimL = plmuon.Mag();
-
-  const double Epprim = baryonfullp->E();//already experimental momentum
-  const double pprimL = plbaryon.Mag();
-
-  const double pT = vdPt.Mag();
-
-  //void getdPL(const double beamMass, const double dPT, const double pLl, const double pLn, const double el, const double en, const double m1, const double m2)
-  const double pL = getdPL(beamMass, pT, kprimL, pprimL, Eprim, Epprim, ma, mastar);
-
+  //previous calculation has a bug in primL, where by definition both are positive, which could in fact be negative.
+  //effect 506/126897 = 0.004; 50 out of 506 causing neutronmomentum difference larger than 10%; mx difference is all smaller than 1%
   /*
   const double factor = ma - Eprim - Epprim + kprimL + pprimL;
   const double pL = -(mastar*mastar + pT*pT-factor*factor)/2.0/factor;
@@ -572,27 +554,25 @@ void getCommonTKI(const int targetA, const int targetZ, const TLorentzVector *be
     exit(1);
   }
   */
-
-  neutronmomentum = TMath::Sqrt(pL*pL + pT*pT);
-
-  //printf("testpn ma %f mastar %f pL %f neutronmomentum %f\n", ma, mastar, pL, neutronmomentum);
-
-  pBeam = kprimL+pprimL - pL; 
+  
+  const double pLFS = allFSfullp.Vect().Dot(beamfullp->Vect().Unit());
+  //double getIniNtrueP(const double beamP, const double dPT, const double pLFS)
+  getIniNtrueP(beamfullp->P(), dpt, pLFS);//to-do: save to tree
   
   //printf("testbug  P %f E %f M %f\n", beamfullp->P(), beamfullp->E(), beamfullp->M());
-  const double tmpBeamP = beamfullp->P();
-  //double getMx(const double beamMass, const double beamMomentum, const double dPT, const double pLl, const double pLn, const double el, const double en, const double m1)
-  Mx = getMx(beamMass, tmpBeamP, pT, kprimL, pprimL, Eprim, Epprim, ma);
-  
-}
+  const double ma     = nuclearMass(targetA, targetZ);
+  //double getMx(const double beamMass, const double beamP, const double dPT, const double pLFS, const double eFS, const double m1)
+  Mx = getMx(beamfullp->M(), beamfullp->P(), dpt, pLFS, allFSfullp.E(), ma);
 
- /*
-void getCommonTKI(const int targetA, const int targetZ, const TLorentzVector *beamfullp, const TLorentzVector *muonfullp, const TLorentzVector *baryonfullp, double & dalphat, double & dphit, double & dpt, double & neutronmomentum, double & muontheta, double & baryontheta)
-{
-  double dummydptt, dummybeamenergy;
-  getCommonTKI(targetA, targetZ, beamfullp, muonfullp, baryonfullp, dalphat, dphit, dpt, neutronmomentum, dummydptt, muontheta, baryontheta, dummybeamenergy);
+  //only assume one nucleon removal
+  const double mastar = nuclearMassStar(targetA, targetZ);
+  //double getdPL(const double beamMass, const double dPT, const double pLFS, const double eFS, const double m1, const double m2)
+  const double dpL = getdPL(beamfullp->M(), dpt, pLFS, allFSfullp.E(), ma, mastar);
+
+  iniNcalcP = TMath::Sqrt(dpL*dpL + dpt*dpt);
+  //printf("testpn ma %f mastar %f pL %f iniNcalcP %f\n", ma, mastar, pL, iniNcalcP);
+  beamcalcP = pLFS - dpL; 
 }
- */
 
 //end of namespace
 }
