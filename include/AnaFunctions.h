@@ -511,7 +511,7 @@ double getdPL(const double beamMass, const double dPT, const double pLFS, const 
    }
 }
 
-void getCommonTKI(const int targetA, const int targetZ, const TLorentzVector *beamfullp, const TLorentzVector *scatterfullp, const TLorentzVector *recoilfullp, double & dalphat, double & dphit, double & dpt, double & dpTT, double & beamCaclP, double & enm_pn, double & recoilM, double & recoilP)
+void getCommonTKI(const int targetA, const int targetZ, const TLorentzVector *beamfullp, const TLorentzVector *scatterfullp, const TLorentzVector *recoilfullp, double & dalphat, double & dphit, double & dpt, double & dpTT, double & beamCalcP, double & IApN, double & recoilM, double & recoilP)
 {
   //
   //note that this is for general calculation, all particle energy is sqrt(p^2+m^2)!
@@ -557,10 +557,9 @@ void getCommonTKI(const int targetA, const int targetZ, const TLorentzVector *be
     //double getdPL(const double beamMass, const double dPT, const double pLFS, const double eFS, const double m1, const double m2)
     const double dpL = getdPL(beamfullp->M(), dpt, pLFS, allFSfullp.E(), ma, mastar);
 
-    //emulated nucleon momentum
-    beamCaclP = pLFS - dpL;
-    enm_pn = TMath::Sqrt(dpL*dpL + dpt*dpt);
-    //printf("testpn ma %f mastar %f pL %f enm_pn %f\n", ma, mastar, pL, enm_pn);
+    beamCalcP = pLFS - dpL;
+    IApN = TMath::Sqrt(dpL*dpL + dpt*dpt);//implus approximation, emulated nucleon momentum assuming single nucleon knock-out
+    //printf("testpn ma %f mastar %f pL %f IApN %f\n", ma, mastar, pL, IApN);
   }//(1)<---
     
   {//(2)---> knowing beam 4-momentum
