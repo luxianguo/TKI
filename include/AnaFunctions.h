@@ -519,8 +519,9 @@ void getCommonTKI(const int targetA, const int targetZ, const TLorentzVector *be
   const TLorentzVector allFSfullp =  scatterfullp ? ((*recoilfullp)+(*scatterfullp)) : (*recoilfullp) ;
   const TVector3 vdPt = getPtVect(&allFSfullp, beamfullp);
   dpt = vdPt.Mag();
-  
-  if(scatterfullp){
+
+  //use block to separate the variable definitions
+  {//(0)
     const TVector3 pTscatter = getPtVect(scatterfullp, beamfullp);
     const TVector3 pTrecoil  = getPtVect(recoilfullp, beamfullp);
 
@@ -551,7 +552,6 @@ void getCommonTKI(const int targetA, const int targetZ, const TLorentzVector *be
 
   //printf("testbug  P %f E %f M %f\n", beamfullp->P(), beamfullp->E(), beamfullp->M());
 
-  //use block to separate the variable definitions
   {//(1)---> without knowledge of the beam momentum/energy, only direction and mass
     const double mastar = nuclearMassStar(targetA, targetZ);  //only assume one nucleon removal
     //double getdPL(const double beamMass, const double dPT, const double pLFS, const double eFS, const double m1, const double m2)
