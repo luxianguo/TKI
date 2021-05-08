@@ -441,7 +441,8 @@ double getRecoilM(const double beamMass, const double beamP, const double dPT, c
   const double mxSq = TMath::Power(beamEnergy - BB, 2) - iniNp*iniNp;
 
   if(mxSq<0){
-    printf("AnaFunctions::getRecoilM mxSq<0 beamEnergy %f BB %f dPT %f mxSq %f\n", beamEnergy, BB, dPT, mxSq); 
+    //do not print. Too many for GiBUU because no nucleus is included
+    //printf("AnaFunctions::getRecoilM mxSq<0 beamEnergy %f BB %f dPT %f mxSq %f\n", beamEnergy, BB, dPT, mxSq); 
     return -999;
     //exit(1);
   }
@@ -498,7 +499,8 @@ double getdPL(const double beamMass, const double dPT, const double pLFS, const 
      return dpL;
    }
    else if(kpass==0){
-     printf("AnaFunctions::getdPL *no* solution AA %f sol1 %f sol2 %f lhs1 %f lhs2 %f\n", AA, sol1, sol2, lhs1, lhs2);
+     //do not print, too many for GiBUU because no nucleus is included
+     //printf("AnaFunctions::getdPL *no* solution AA %f sol1 %f sol2 %f lhs1 %f lhs2 %f\n", AA, sol1, sol2, lhs1, lhs2);
      return -999;
    }
    else{
