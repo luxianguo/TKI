@@ -441,8 +441,9 @@ double getRecoilM(const double beamMass, const double beamP, const double dPT, c
   const double mxSq = TMath::Power(beamEnergy - BB, 2) - iniNp*iniNp;
 
   if(mxSq<0){
-    printf("AnaFunctions::getRecoilM mxSq<0 beamEnergy %f BB %f dPT %f mxSq %f\n", beamEnergy, BB, dPT, mxSq); exit(1);
-    //return -999;
+    printf("AnaFunctions::getRecoilM mxSq<0 beamEnergy %f BB %f dPT %f mxSq %f\n", beamEnergy, BB, dPT, mxSq); 
+    return -999;
+    //exit(1);
   }
   else{
     return TMath::Sqrt(mxSq); 
@@ -496,6 +497,10 @@ double getdPL(const double beamMass, const double dPT, const double pLFS, const 
    if(kpass==1){
      return dpL;
    }
+   else if(kpass==0){
+     printf("AnaFunctions::getdPL *no* solution AA %f sol1 %f sol2 %f lhs1 %f lhs2 %f\n", AA, sol1, sol2, lhs1, lhs2);
+     return -999;
+   }
    else{
      printf("AnaFunctions::getdPL bad solution AA %f sol1 %f sol2 %f lhs1 %f lhs2 %f\n", AA, sol1, sol2, lhs1, lhs2);
      exit(1);
@@ -548,8 +553,12 @@ void getCommonTKI(const int targetA, const int targetZ, const TLorentzVector *be
     //double getdPL(const double beamMass, const double dPT, const double pLFS, const double eFS, const double m1, const double m2)
     const double dpL = getdPL(beamfullp->M(), dpt, pLFS, allFSfullp.E(), ma, mastar);
 
-    beamCalcP = pLFS - dpL;
-    IApN = TMath::Sqrt(dpL*dpL + dpt*dpt);//implus approximation, emulated nucleon momentum assuming single nucleon knock-out
+    beamCalcP = -999;
+    IApN = -999;
+    if(dpL!=-999){
+      beamCalcP = pLFS - dpL;
+      IApN = TMath::Sqrt(dpL*dpL + dpt*dpt);//implus approximation, emulated nucleon momentum assuming single nucleon knock-out
+    }
     //printf("testpn ma %f mastar %f pL %f IApN %f\n", ma, mastar, pL, IApN);
   }//(1)<---
     
