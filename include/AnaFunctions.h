@@ -15,15 +15,6 @@ Double_t KaonMass(){ return 493.677/1e3;}//in GeV //wiki
 Double_t ElectronMass(){ return 0.510998/1e3;}//in GeV //wiki
 Double_t PiZeroMass(){return 134.976/1e3;}//in GeV//wiki
 
-  /*
-double MA()
-{
-  const double MA = 6*NeutronMass() + 6*ProtonMass() - 92.162/1E3;//GeV
-
-  return MA;
-}
-  */
-  
 int getTargetA(const int targetZ)
 {
   if(targetZ == 1){
