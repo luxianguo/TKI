@@ -402,7 +402,7 @@ double SmeardpTT(const double sigma)
   return fran->GetRandom();
 }
 
-double GetThetaRef(const TVector3 &vold, const TVector3 &vreftmp)
+double GetThetaRef(const TVector3 &vold, const TVector3 &vreftmp)//in deg
 {
   const TVector3 vrefUnit = vreftmp.Unit();
 
