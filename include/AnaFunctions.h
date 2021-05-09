@@ -459,7 +459,7 @@ double getdPL(const double beamMass, const double dPT, const double pLFS, const 
   //generalized to massive beam by Xianguo Lu
   //all in GeV  
 
-   //printf("debug beamMass %f m1 %f m2 %f dpT %f pLl %f pLn %f el %f en %f\n", beamMass, m1, m2, dPT, pLl, pLn, el, en);
+   //printf("debug beamMass %f m1 %f m2 %f dpT %f pLFS %f eFS %f\n", beamMass, m1, m2, dPT, pLFS, eFS);
    
    const double AA = pLFS;
    const double BB = eFS - m1;
