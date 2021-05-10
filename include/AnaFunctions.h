@@ -471,8 +471,9 @@ double getdPL(const double beamMass, const double dPT, const double pLFS, const 
    const double delta = 4*aa*aa*bb*bb-4*(aa*aa-1)*(bb*bb-CC);
 
    if(delta<0){
-     printf("AnaFunctions::getdPL delta < 0!! aa %f bb %f CC %f delta %f\n", aa, bb, CC, delta);
-     exit(1);
+     //too many for all GEANT4 events, stop printing --- printf("AnaFunctions::getdPL delta < 0!! aa %f bb %f CC %f delta %f\n", aa, bb, CC, delta);
+     //allow this because it can happen very often if the m2 assumption is very wrong --- exit(1);
+     return -999;
    }
    
    const double sol1 = (-2*aa*bb+TMath::Sqrt(delta))/2/(aa*aa-1);
