@@ -506,7 +506,8 @@ double getdPL(const double beamMass, const double dPT, const double pLFS, const 
    }
    else{
      printf("AnaFunctions::getdPL bad solution AA %f sol1 %f sol2 %f lhs1 %f lhs2 %f\n", AA, sol1, sol2, lhs1, lhs2);
-     exit(1);
+     //test let it pass, can happen for few GEANT4 new format events exit(1);
+     return -999;
    }
 }
 
