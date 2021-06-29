@@ -3,6 +3,10 @@
 
 using namespace std;
 
+const double gkDPLBAD = -888;
+const double gkRECOILMBAD = -777;
+const double gkDALPHATBAD = -999;
+
 namespace AnaFunctions
 {
 
@@ -442,8 +446,8 @@ double getRecoilM(const double beamMass, const double beamP, const double dPT, c
 
   if(mxSq<0){
     //do not print. Too many for GiBUU because no nucleus is included
-    //printf("AnaFunctions::getRecoilM mxSq<0 beamEnergy %f BB %f dPT %f mxSq %f\n", beamEnergy, BB, dPT, mxSq); 
-    return -999;
+    //printf("AnaFunctions::getRecoilM mxSq<0 beamEnergy %f BB %f dPT %f mxSq %f\n", beamEnergy, BB, dPT, mxSq); //print for GEANT4
+    return gkRECOILMBAD;
     //exit(1);
   }
   else{
@@ -473,7 +477,7 @@ double getdPL(const double beamMass, const double dPT, const double pLFS, const 
    if(delta<0){
      //too many for all GEANT4 events, stop printing --- printf("AnaFunctions::getdPL delta < 0!! aa %f bb %f CC %f delta %f\n", aa, bb, CC, delta);
      //allow this because it can happen very often if the m2 assumption is very wrong --- exit(1);
-     return -999;
+     return gkDPLBAD;
    }
    
    const double sol1 = (-2*aa*bb+TMath::Sqrt(delta))/2/(aa*aa-1);
@@ -502,12 +506,12 @@ double getdPL(const double beamMass, const double dPT, const double pLFS, const 
    else if(kpass==0){
      //do not print, too many for GiBUU because no nucleus is included
      //printf("AnaFunctions::getdPL *no* solution AA %f sol1 %f sol2 %f lhs1 %f lhs2 %f\n", AA, sol1, sol2, lhs1, lhs2);
-     return -999;
+     return gkDPLBAD;
    }
    else{
      printf("AnaFunctions::getdPL bad solution AA %f sol1 %f sol2 %f lhs1 %f lhs2 %f\n", AA, sol1, sol2, lhs1, lhs2);
      //test let it pass, can happen for few GEANT4 new format events exit(1);
-     return -999;
+     return gkDPLBAD;
    }
 }
 
@@ -532,7 +536,7 @@ void getCommonTKI(const int targetA, const int targetZ, const TLorentzVector *be
       dalphat = TMath::ACos(    vdPt.Dot(unitqt)/vdPt.Mag()    )*TMath::RadToDeg(); //in Deg
     }
     else{//hydrogen
-      dalphat=-999;
+      dalphat= gkDALPHATBAD ;
     }
 
     //if dpt<1E-5, then dpTT is independent of dalphat anyway
@@ -557,9 +561,9 @@ void getCommonTKI(const int targetA, const int targetZ, const TLorentzVector *be
     //double getdPL(const double beamMass, const double dPT, const double pLFS, const double eFS, const double m1, const double m2)
     const double dpL = getdPL(beamfullp->M(), dpt, pLFS, allFSfullp.E(), ma, mastar);
 
-    beamCalcP = -999;
-    IApN = -999;
-    if(dpL!=-999){
+    beamCalcP = gkDPLBAD;
+    IApN = gkDPLBAD;
+    if(dpL!= gkDPLBAD ){
       beamCalcP = pLFS - dpL;
       IApN = TMath::Sqrt(dpL*dpL + dpt*dpt);//implus approximation, emulated nucleon momentum assuming single nucleon knock-out
     }
