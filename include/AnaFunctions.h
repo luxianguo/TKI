@@ -446,7 +446,7 @@ double getRecoilM(const double beamMass, const double beamP, const double dPT, c
 
   if(mxSq<0){
     //do not print. Too many for GiBUU because no nucleus is included
-    //printf("AnaFunctions::getRecoilM mxSq<0 beamEnergy %f BB %f dPT %f mxSq %f\n", beamEnergy, BB, dPT, mxSq); //print for GEANT4
+    //printf("AnaFunctions::getRecoilM mxSq<0 beamEnergy %f BB %f dPT %f mxSq %f\n", beamEnergy, BB, dPT, mxSq); //print for TESTBEAM
     return gkRECOILMBAD;
     //exit(1);
   }
@@ -475,7 +475,7 @@ double getdPL(const double beamMass, const double dPT, const double pLFS, const 
    const double delta = 4*aa*aa*bb*bb-4*(aa*aa-1)*(bb*bb-CC);
 
    if(delta<0){
-     //too many for all GEANT4 events, stop printing --- printf("AnaFunctions::getdPL delta < 0!! aa %f bb %f CC %f delta %f\n", aa, bb, CC, delta);
+     //too many for all TESTBEAM events, stop printing --- printf("AnaFunctions::getdPL delta < 0!! aa %f bb %f CC %f delta %f\n", aa, bb, CC, delta);
      //allow this because it can happen very often if the m2 assumption is very wrong --- exit(1);
      return gkDPLBAD;
    }
@@ -510,7 +510,7 @@ double getdPL(const double beamMass, const double dPT, const double pLFS, const 
    }
    else{
      printf("AnaFunctions::getdPL bad solution AA %f sol1 %f sol2 %f lhs1 %f lhs2 %f\n", AA, sol1, sol2, lhs1, lhs2);
-     //test let it pass, can happen for few GEANT4 new format events exit(1);
+     //test let it pass, can happen for few TESTBEAM new format events exit(1);
      return gkDPLBAD;
    }
 }
