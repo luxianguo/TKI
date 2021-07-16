@@ -28,6 +28,11 @@ const TString gTagNOH="NOH";
 const TString gTagSTK="STK";
 const TString gTagTXT="TXT";
 
+void style::PrintStat(const TString tag, const double oldsel, const double newn)
+{
+  printf("%-70s: old %10.1f selected %10.1f fraction %.1f%%\n", tag.Data(), oldsel, newn, newn/oldsel*100);
+}
+
 double style::PrintStat(const TString tag, TH1 *hh, const double val0, const double val1, const double oldsel)
 {
   const double newall = hh->Integral(0,100000);
