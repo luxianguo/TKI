@@ -515,18 +515,18 @@ double getdPL(const double beamMass, const double dPT, const double pLFS, const 
    }
 }
 
-void getCommonTKI(const int targetA, const int targetZ, const TLorentzVector *beamfullp, const TLorentzVector *scatterfullp, const TLorentzVector *recoilfullp, double & dalphat, double & dphit, double & dpt, double & dpTT, double & beamCalcP, double & IApN, double & recoilM, double & recoilP)
+void getCommonTKI(const int targetA, const int targetZ, const TLorentzVector *tmp4pBeam, const TLorentzVector *tmp4pScatter, const TLorentzVector *tmp4pRecoil, double & dalphat, double & dphit, double & dpt, double & dpTT, double & beamCalcP, double & IApN, double & recoilM, double & recoilP)
 {
   //
   //note that this is for general calculation, all particle energy is sqrt(p^2+m^2)!
   //
-  const TLorentzVector allFSfullp =  scatterfullp ? ((*recoilfullp)+(*scatterfullp)) : (*recoilfullp) ;
-  const TVector3 vdPt = getPtVect(&allFSfullp, beamfullp);
+  const TLorentzVector tmp4pAllFS =  tmp4pScatter ? ((*tmp4pRecoil)+(*tmp4pScatter)) : (*tmp4pRecoil) ;
+  const TVector3 vdPt = getPtVect(&tmp4pAllFS, tmp4pBeam);
   dpt = vdPt.Mag();
 
-  if(scatterfullp){
-    const TVector3 pTscatter = getPtVect(scatterfullp, beamfullp);
-    const TVector3 pTrecoil  = getPtVect(recoilfullp, beamfullp);
+  if(tmp4pScatter){
+    const TVector3 pTscatter = getPtVect(tmp4pScatter, tmp4pBeam);
+    const TVector3 pTrecoil  = getPtVect(tmp4pRecoil, tmp4pBeam);
 
     const TVector3 unitqt = -pTscatter.Unit();
     dphit   = TMath::ACos(pTrecoil.Dot(unitqt)/pTrecoil.Mag())*TMath::RadToDeg(); //in Deg 
@@ -541,7 +541,7 @@ void getCommonTKI(const int targetA, const int targetZ, const TLorentzVector *be
 
     //if dpt<1E-5, then dpTT is independent of dalphat anyway
     dpTT = dpt * sin(dalphat*TMath::DegToRad());
-    const Double_t dotcross = recoilfullp->Vect().Dot( (beamfullp->Vect()).Cross( scatterfullp->Vect() ));
+    const Double_t dotcross = tmp4pRecoil->Vect().Dot( (tmp4pBeam->Vect()).Cross( tmp4pScatter->Vect() ));
     if(dotcross<0){
       dpTT *= -1;
     }
@@ -550,16 +550,16 @@ void getCommonTKI(const int targetA, const int targetZ, const TLorentzVector *be
   //previous calculation has a bug in primL, where by definition both are positive, which could in fact be negative.
   //effect 506/126897 = 0.004; 50 out of 506 causing neutronmomentum difference larger than 10%; mx difference is all smaller than 1%
   //only affects events with backward final states which are not in the previous calcuation for MINERvA mu and proton
-  const double pLFS = allFSfullp.Vect().Dot(beamfullp->Vect().Unit());
+  const double pLFS = tmp4pAllFS.Vect().Dot(tmp4pBeam->Vect().Unit());
   const double ma     = nuclearMass(targetA, targetZ);
 
-  //printf("testbug  P %f E %f M %f\n", beamfullp->P(), beamfullp->E(), beamfullp->M());
+  //printf("testbug  P %f E %f M %f\n", tmp4pBeam->P(), tmp4pBeam->E(), tmp4pBeam->M());
 
   //use block to separate the variable definitions
   {//(1)---> without knowledge of the beam momentum/energy, only direction and mass
     const double mastar = nuclearMassStar(targetA, targetZ);  //only assume one nucleon removal
     //double getdPL(const double beamMass, const double dPT, const double pLFS, const double eFS, const double m1, const double m2)
-    const double dpL = getdPL(beamfullp->M(), dpt, pLFS, allFSfullp.E(), ma, mastar);
+    const double dpL = getdPL(tmp4pBeam->M(), dpt, pLFS, tmp4pAllFS.E(), ma, mastar);
 
     beamCalcP = gkDPLBAD;
     IApN = gkDPLBAD;
@@ -572,10 +572,10 @@ void getCommonTKI(const int targetA, const int targetZ, const TLorentzVector *be
     
   {//(2)---> knowing beam 4-momentum
     //double getRecoilM(const double beamMass, const double beamP, const double dPT, const double pLFS, const double eFS, const double m1)
-    recoilM = getRecoilM(beamfullp->M(), beamfullp->P(), dpt, pLFS, allFSfullp.E(), ma);
+    recoilM = getRecoilM(tmp4pBeam->M(), tmp4pBeam->P(), dpt, pLFS, tmp4pAllFS.E(), ma);
 
     //double getRecoilP(const double beamP, const double dPT, const double pLFS)
-    recoilP = getRecoilP(beamfullp->P(), dpt, pLFS);
+    recoilP = getRecoilP(tmp4pBeam->P(), dpt, pLFS);
   }//(2)<---
 }
 
