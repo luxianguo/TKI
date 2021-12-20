@@ -27,7 +27,7 @@ comm="rootcint -f ${code}Dict.cxx ${rcopt} $cflag  ${code}.h ${code}LinkDef.h"
 echo $comm
 eval $comm  || exit 1
 
-comm="g++ $cflag  -fPIC -c ${code}Dict.cxx -o ${code}Dict.o"
+comm="g++ \"$cflag\"  -fPIC -c ${code}Dict.cxx -o ${code}Dict.o"
 echo $comm
 eval $comm || exit 1
 
