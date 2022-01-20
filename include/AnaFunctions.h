@@ -1,11 +1,15 @@
 #ifndef _ANAFUNCTIONS_
 #define _ANAFUNCTIONS_
 
+#include "TRandom3.h"
+
 using namespace std;
 
 const double gkDPLBAD = -888;
 const double gkRECOILMBAD = -777;
 const double gkDALPHATBAD = -999;
+
+TRandom3 gRan(1800);
 
 namespace AnaFunctions
 {
@@ -19,6 +23,58 @@ Double_t KaonMass(){ return 493.677/1e3;}//in GeV //wiki
 Double_t ElectronMass(){ return 0.510998/1e3;}//in GeV //wiki
 Double_t PiZeroMass(){return 134.976/1e3;}//in GeV//wiki
 
+TLorentzVector getSmearVector(const int tmppdg, const TLorentzVector * tmpsecondary)
+{
+  double momRes=0;
+
+  //momRes in fraction 0.0xx
+  if(tmppdg==211){//pi+
+    momRes = 0.07;
+  }
+  else if(tmppdg==2212){//proton
+    momRes = 0.06;
+  }
+  else if(tmppdg==111){//pi0
+    momRes = 0.1;
+  }
+  else{//no smearing
+    return (*tmpsecondary);
+  }
+  
+  const double thetaRes=5*TMath::DegToRad();
+  const double phiRes  =5*TMath::DegToRad();
+
+  const double momDelta   = gRan.Gaus(0,momRes);
+  const double thetaDelta = gRan.Gaus(0,thetaRes);
+  const double phiDelta   = gRan.Gaus(0,phiRes);
+  
+  const double mom   = tmpsecondary->P()*(1+momDelta);
+  const double theta = tmpsecondary->Theta()+thetaDelta;
+  const double phi   = tmpsecondary->Phi()+phiDelta;
+  
+  TVector3 v3;
+  v3.SetMagThetaPhi(mom, theta, phi);
+  
+  const double mass = tmpsecondary->M();
+  
+  TLorentzVector vout;
+  vout.SetVectM(v3, mass);
+
+  /*
+  printf("===== test open: pdg %d momRes %f Delta %f theta %f %f phi %f %f ====\n", tmppdg, momRes, momDelta, thetaRes, thetaDelta, phiRes, phiDelta);
+  static int nprint=0;
+  printf("Before:"); tmpsecondary->Print();
+  printf("After: "); vout.Print();
+  nprint++;
+  printf("===== test end %d ====\n", nprint);
+  if(nprint==10){
+    exit(1);
+  }
+  */
+  
+  return vout;
+}
+  
 int getTargetA(const int targetZ)
 {
   if(targetZ == 1){
