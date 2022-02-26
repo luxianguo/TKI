@@ -23,7 +23,7 @@ Double_t KaonMass(){ return 493.677/1e3;}//in GeV //wiki
 Double_t ElectronMass(){ return 0.510998/1e3;}//in GeV //wiki
 Double_t PiZeroMass(){return 134.976/1e3;}//in GeV//wiki
 
-TLorentzVector getSmearVector(const int tmppdg, const TLorentzVector * tmpsecondary)
+TLorentzVector getSmearVector(const int tmppdg, const TLorentzVector * tmpsecondary, int smearBit)
 {
   double momRes=0;
 
@@ -44,9 +44,9 @@ TLorentzVector getSmearVector(const int tmppdg, const TLorentzVector * tmpsecond
   const double thetaRes=5*TMath::DegToRad();
   const double phiRes  =5*TMath::DegToRad();
 
-  const double momDelta   = gRan.Gaus(0,momRes);
-  const double thetaDelta = gRan.Gaus(0,thetaRes);
-  const double phiDelta   = gRan.Gaus(0,phiRes);
+  const double momDelta   = (smearBit&1)? gRan.Gaus(0,momRes)   : 0;
+  const double thetaDelta = (smearBit&2)? gRan.Gaus(0,thetaRes) : 0;
+  const double phiDelta   = (smearBit&4)? gRan.Gaus(0,phiRes)   : 0;
   
   const double mom   = tmpsecondary->P()*(1+momDelta);
   const double theta = tmpsecondary->Theta()+thetaDelta;
@@ -61,7 +61,7 @@ TLorentzVector getSmearVector(const int tmppdg, const TLorentzVector * tmpsecond
   vout.SetVectM(v3, mass);
 
   /*
-  printf("===== test open: pdg %d momRes %f Delta %f theta %f %f phi %f %f ====\n", tmppdg, momRes, momDelta, thetaRes, thetaDelta, phiRes, phiDelta);
+  printf("===== test open: pdg %d momRes %f Delta %f theta %f %f phi %f %f smearBit %d====\n", tmppdg, momRes, momDelta, thetaRes, thetaDelta, phiRes, phiDelta, smearBit);
   static int nprint=0;
   printf("Before:"); tmpsecondary->Print();
   printf("After: "); vout.Print();
