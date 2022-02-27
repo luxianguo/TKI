@@ -29,13 +29,17 @@ TLorentzVector getSmearVector(const int tmppdg, const TLorentzVector * tmpsecond
 
   //momRes in fraction 0.0xx
   if(tmppdg==211){//pi+
-    momRes = 0.07;
+    //momRes = 0.07;
+    momRes = 0.02;
   }
   else if(tmppdg==2212){//proton
-    momRes = 0.06;
+    //momRes = 0.06;
+    momRes = 0.02;
   }
   else if(tmppdg==111){//pi0
-    momRes = 0.1;
+    //momRes = 0.1;
+    //momRes = 0.02;
+    momRes = 0.05;
   }
   else{//no smearing
     return (*tmpsecondary);
