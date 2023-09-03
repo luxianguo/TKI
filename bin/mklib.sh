@@ -2,8 +2,9 @@ code=$1
 
 rm -f lib${code}.so  *.o *Dict.* 
 
-cflag="$(root-config --auxcflags | tr -s ' ' '\n' | grep c++1)  -I$(root-config --incdir) -I$(pwd)"
-
+rcntflag="-I$(root-config --incdir) -I$(pwd)"
+cflag="$(root-config --auxcflags | tr -s ' ' '\n' | grep c++1)  ${rcntflag}"
+echo $rcntflag
 echo $cflag
 
 echo 
@@ -23,7 +24,7 @@ else
     exit 1
 fi
 
-comm="rootcint -f ${code}Dict.cxx ${rcopt} $cflag  ${code}.h ${code}LinkDef.h"
+comm="rootcint -f ${code}Dict.cxx ${rcopt} $rcntflag  ${code}.h ${code}LinkDef.h"
 echo $comm
 eval $comm  || exit 1
 
